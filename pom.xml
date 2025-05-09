@@ -60,10 +60,10 @@
             <version>24.1.0</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
+		<!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
+        </dependency> -->
 
         <!-- AWS S3 Dependencies -->
         <dependency>
@@ -96,7 +96,7 @@
         </dependency>
 
         <!-- JWT Dependencies -->
-        <dependency>
+        <!-- <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>0.11.5</version>
@@ -112,7 +112,7 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
             <scope>runtime</scope>
-        </dependency>
+        </dependency> -->
 
     </dependencies>
 
