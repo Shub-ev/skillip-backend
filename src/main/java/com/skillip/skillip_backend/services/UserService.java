@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.skillip.skillip_backend.services.AuthService;
+
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,9 @@ public class UserService {
     private static final String ALLOWED_CONTENT_TYPES = "image/jpeg,image/png,image/gif";
 
     @Autowired
+    private final AuthService authService;
+
+    @Autowired
     private final UserRepository userRepository;  // Field injection
 
     @Autowired
@@ -43,9 +48,10 @@ public class UserService {
     @Value("${application.bucket.name}")
     private String bucketName;
 
-    public UserService(UserRepository userRepository, AmazonS3 amazonS3) {
+    public UserService(UserRepository userRepository, AmazonS3 amazonS3, AuthService authService) {
         this.userRepository = userRepository;
         this.amazonS3 = amazonS3;
+        this.authService = authService;
     }
 
     public UserDTO createUser(@NotNull User user){
@@ -98,6 +104,9 @@ public class UserService {
     public ResponseEntity<Map<String, Object>> uploadProfileImage(String email, MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
+
+        // set the expiration time for the presigned URL 
+        Long expirationTimeInMilis = 1000L * 60 * 60 * 24 * 7; // 7 days
 
         try {
             // Validate file
@@ -157,6 +166,12 @@ public class UserService {
             // logger.info("Profile image uploaded successfully for user: {}", email);
             response.put("message", "Profile image uploaded successfully");
             response.put("status", HttpStatus.OK.value());
+
+            // add presigned URL  and  expiration time
+            String profileImageUrl = authService.generatePresignedURL(user);
+            response.put("profileImageUrl", profileImageUrl);
+            response.put("imageUrlExpiration", expirationTimeInMilis);
+
             return new ResponseEntity<>(response, HttpStatus.OK);
             
         } catch (UserNotFoundException e) {
